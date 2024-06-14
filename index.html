@@ -1,0 +1,69 @@
+<head>
+	<title>AI Jan Ken Pon v0.1</title>
+	<link rel="stylesheet" type="text/css" href="./styles.css" />
+	<link rel="icon" type="image/x-icon" href="./favicon.png" />
+</head>
+<body>
+	<div id="instructions">
+		<p>Let's play Jan/Ken/Pon!<br>
+		Gu smashes Choki, Choki cuts Pa, and Pa covers Gu.</p>
+	</div>
+	<div id="game">&nbsp</div>
+	<div id="userInput">
+		<input type="text" id="plyInput" name="plyChoice" placeholder="Select Gu, Choki, Pa." onkeydown="keyChecker(this)" />
+		<input type="button" id="btnSubmit" name="btnSubmit" value="SUBMIT!" />
+	</div>
+</body>
+
+<script>
+	var plyChoice, plyChoiceText, compChoice, compChoiceText, options;
+	options = ["gu","pa", "choki"], weights=[32,32,32];
+
+	document.getElementById("btnSubmit").addEventListener("click", logic);
+
+	function keyChecker(element){
+		if(event.key == "Enter"){
+			logic();
+		}
+	}
+	function logic(){
+		var message; 
+		plyChoiceText = document.getElementById("plyInput").value;
+
+		if (options.includes(plyChoiceText.toLowerCase())){
+			compChoice = Math.random();  // random number 0 - 0.999999
+
+			// compChoice = Math.floor(compChoice * 3); // convert to [0,1,2] by getting rid of decimal (rounding down) after multiplication (to set range)
+			compChoice *= (weights[0] + weights[1] + weights[2]);
+			// compChoiceText = options[compChoice];
+			compChoiceText = "gu";
+			if (compChoice > weights[0]){
+				compChoiceText = "pa";
+			}
+			if (compChoice > weights[0] + weights[1]){
+				compChoiceText = "choki";
+			}
+			compChoice = options.indexOf(compChoiceText);
+			plyChoice = options.indexOf(plyChoiceText.toLowerCase());
+
+			var result = (3+(plyChoice - compChoice)) % 3;  //Divide and take remainder
+
+			if (result == 0){ //Tie
+				message = "I picked '"+compChoiceText+"'. You picked '"+plyChoiceText+"'. We tied!";
+			} else if (result == 1){ //Win
+				message = "I picked '"+compChoiceText+"'. You picked '"+plyChoiceText+"'. Your victory!!";
+				weights[compChoice] *= .5;
+			} else {  //Lose
+				message = "I picked '"+compChoiceText+"'. You picked '"+plyChoiceText+"'. Your defeat!";
+				weights[compChoice] *= 2;
+			} 
+		} else {
+			message = "Please only choose 'Gu', 'Pa', or 'Choki'";
+		}
+
+		document.getElementById("game").innerHTML = document.getElementById("game").innerHTML + "<p>" + message + "</p>"	
+		// document.getElementById("game").innerHTML = document.getElementById("game").innerHTML + "<p>" + compChoice+plyChoice+result + "</p>"
+
+	}
+</script>
+
